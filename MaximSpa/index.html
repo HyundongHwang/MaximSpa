@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="Scripts/jquery-3.2.1.min.js"></script>
+    <script>
+        //let SERVER_URL = "http://localhost:50264";
+        let SERVER_URL = "https://hhdmaximspa.azurewebsites.net";
+
+        function _loadMaxims() {
+            $("#lstMaxims").html("");
+
+            $.get(SERVER_URL + "/maxim/")
+                .done(function (res, statusStr, xhr) {
+                    console.log("res : " + res);
+                    console.log("statusStr : " + statusStr);
+                    console.log("xhr.status : " + xhr.status);
+                    console.log("xhr.statusText : " + xhr.statusText);
+
+                    for (let key in res) {
+                        let item = res[key];
+                        let str = item.RowKey + " : " + item.Name + " : " + item.Content;
+                        $("<li/>").html(str).appendTo("#lstMaxims");
+                    }
+                }).fail(function (xhr, errStr, statusStr) {
+                    console.log("errStr : " + errStr);
+                    console.log("statusStr : " + statusStr);
+                    console.log("xhr.status : " + xhr.status);
+                    console.log("xhr.statusText : " + xhr.statusText);
+                });
+        }
+
+        $(function () {
+            _loadMaxims();
+
+            $("#btnAdd").click(function () {
+                let name = $("#txtName").val();
+                let content = $("#txtContent").val();
+                $("#txtName").val("");
+                $("#txtContent").val("");
+
+                $.post(SERVER_URL + "/maxim/", {
+                    Name: name,
+                    Content: content,
+                }).done(function (res, statusStr, xhr) {
+                    console.log("res : " + res);
+                    console.log("statusStr : " + statusStr);
+                    console.log("xhr.status : " + xhr.status);
+                    console.log("xhr.statusText : " + xhr.statusText);
+                    _loadMaxims();
+                }).fail(function (xhr, errStr, statusStr) {
+                    console.log("errStr : " + errStr);
+                    console.log("statusStr : " + statusStr);
+                    console.log("xhr.status : " + xhr.status);
+                    console.log("xhr.statusText : " + xhr.statusText);
+                });
+            });
+
+            $("#btnSearch").click(function () {
+                let id = $("#txtRowKey").val();
+                $("#txtRowKey").val("");
+
+                $.get(SERVER_URL + "/maxim/" + id)
+                    .done(function (res, statusStr, xhr) {
+                        console.log("res : " + res);
+                        console.log("statusStr : " + statusStr);
+                        console.log("xhr.status : " + xhr.status);
+                        console.log("xhr.statusText : " + xhr.statusText);
+                        let item = res;
+                        let str = item.RowKey + " : " + item.Name + " : " + item.Content;
+                        $("#lbFoundRow").html(str);
+                    }).fail(function (xhr, errStr, statusStr) {
+                        console.log("errStr : " + errStr);
+                        console.log("statusStr : " + statusStr);
+                        console.log("xhr.status : " + xhr.status);
+                        console.log("xhr.statusText : " + xhr.statusText);
+                    });
+            });
+
+
+            $("#btnDelete").click(function () {
+                $.ajax({
+                    url: SERVER_URL + "/maxim/",
+                    type: "DELETE",
+                }).done(function (res, statusStr, xhr) {
+                    console.log("res : " + res);
+                    console.log("statusStr : " + statusStr);
+                    console.log("xhr.status : " + xhr.status);
+                    console.log("xhr.statusText : " + xhr.statusText);
+                    _loadMaxims();
+                }).fail(function (xhr, errStr, statusStr) {
+                    console.log("errStr : " + errStr);
+                    console.log("statusStr : " + statusStr);
+                    console.log("xhr.status : " + xhr.status);
+                    console.log("xhr.statusText : " + xhr.statusText);
+                });
+            });
+        });
+
+    </script>
+</head>
+<body>
+    <ul id="lstMaxims"></ul>
+    <div>
+        <div>
+            <label>Name : </label>
+            <input type="text" id="txtName" />
+        </div>
+        <div>
+            <label>Content : </label>
+            <input type="text" id="txtContent" />
+        </div>
+        <div>
+            <input type="button" id="btnAdd" value="Add" />
+        </div>
+        <div>
+            <input type="button" id="btnDelete" value="Delete" />
+        </div>
+        <div>
+            <label>RowKey : </label>
+            <input type="text" id="txtRowKey" />
+            <input type="button" id="btnSearch" value="Search" />
+        </div>
+        <div>
+            <label id="lbFoundRow" />
+        </div>
+    </div>
+</body>
+</html>
